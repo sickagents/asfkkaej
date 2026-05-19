@@ -104,10 +104,11 @@ def step_setup(state):
             "kaggle", "competitions", "download",
             "-c", COMPETITION, "-p", str(DATA_DIR), "--force"
         ], check=True)
-        subprocess.run(
-            ["unzip", "-o", str(DATA_DIR / f"{COMPETITION}.zip"), "-d", str(DATA_DIR)],
-            check=True
-        )
+        import zipfile
+        zip_path = DATA_DIR / f"{COMPETITION}.zip"
+        with zipfile.ZipFile(zip_path, "r") as z:
+            z.extractall(DATA_DIR)
+        zip_path.unlink()
     
     done(state, "setup")
     print("  Done.")
