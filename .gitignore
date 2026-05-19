@@ -1,0 +1,13 @@
+# Data (download via kaggle, don't commit)
+data/
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+
+# Models (large, don't commit)
+models/
+
+# OS
+.DS_Store
