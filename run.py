@@ -95,7 +95,7 @@ def step_setup(state):
     
     subprocess.run([
         sys.executable, "-m", "pip", "install", "-q",
-        "lightgbm", "xgboost", "optuna", "pandas", "numpy",
+        "kaggle", "lightgbm", "xgboost", "optuna", "pandas", "numpy",
         "scikit-learn", "scipy"
     ], check=True)
     
