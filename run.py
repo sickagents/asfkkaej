@@ -200,23 +200,21 @@ def step_tune(state, session_start):
     
     def objective(trial):
         params = {
-            "n_estimators": trial.suggest_int("n_estimators", 500, 5000),
-            "learning_rate": trial.suggest_float("learning_rate", 0.003, 0.2, log=True),
-            "max_depth": trial.suggest_int("max_depth", 3, 15),
-            "num_leaves": trial.suggest_int("num_leaves", 20, 512),
-            "subsample": trial.suggest_float("subsample", 0.4, 1.0),
-            "colsample_bytree": trial.suggest_float("colsample_bytree", 0.2, 1.0),
+            "n_estimators": trial.suggest_int("n_estimators", 200, 2000),
+            "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+            "max_depth": trial.suggest_int("max_depth", 3, 12),
+            "num_leaves": trial.suggest_int("num_leaves", 20, 256),
+            "subsample": trial.suggest_float("subsample", 0.5, 1.0),
+            "colsample_bytree": trial.suggest_float("colsample_bytree", 0.3, 1.0),
             "reg_alpha": trial.suggest_float("reg_alpha", 1e-8, 10.0, log=True),
             "reg_lambda": trial.suggest_float("reg_lambda", 1e-8, 10.0, log=True),
-            "min_child_samples": trial.suggest_int("min_child_samples", 3, 200),
-            "min_child_weight": trial.suggest_float("min_child_weight", 1e-3, 10.0, log=True),
-            "max_bin": trial.suggest_int("max_bin", 100, 500),
+            "min_child_samples": trial.suggest_int("min_child_samples", 5, 200),
             "n_jobs": -1,
             "random_state": SEED,
             "verbose": -1,
         }
         
-        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=SEED)
+        skf = StratifiedKFold(n_splits=3, shuffle=True, random_state=SEED)
         oof = np.zeros(len(X))
         
         for tr_idx, val_idx in skf.split(X, y):
@@ -224,7 +222,7 @@ def step_tune(state, session_start):
             model.fit(
                 X.iloc[tr_idx], y.iloc[tr_idx],
                 eval_set=[(X.iloc[val_idx], y.iloc[val_idx])],
-                callbacks=[lgb.early_stopping(100), lgb.log_evaluation(0)]
+                callbacks=[lgb.early_stopping(30), lgb.log_evaluation(0)]
             )
             oof[val_idx] = model.predict_proba(X.iloc[val_idx])[:, 1]
         
@@ -246,7 +244,7 @@ def step_tune(state, session_start):
     )
     
     remaining_sec = MAX_MINUTES * 60 - (time.time() - session_start)
-    n_trials = max(50, min(N_TRIALS, int(remaining_sec / 15)))
+    n_trials = max(50, min(N_TRIALS, int(remaining_sec / 30)))
     
     print(f"  Running {n_trials} trials on {os.cpu_count()} cores...")
     study.optimize(objective, n_trials=n_trials, n_jobs=1, show_progress_bar=True)
