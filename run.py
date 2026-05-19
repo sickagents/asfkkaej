@@ -99,22 +99,16 @@ def step_setup(state):
         "scikit-learn", "scipy"
     ], check=True)
     
-    if not (DATA_DIR / "train").exists():
+    if not (DATA_DIR / "train.csv").exists():
         subprocess.run([
             "kaggle", "competitions", "download",
             "-c", COMPETITION, "-p", str(DATA_DIR), "--force"
         ], check=True)
         import zipfile
         zip_path = DATA_DIR / f"{COMPETITION}.zip"
-        if zip_path.exists():
-            with zipfile.ZipFile(zip_path, "r") as z:
-                z.extractall(DATA_DIR)
-            zip_path.unlink()
-        # Handle multiple zips if any
-        for zf in DATA_DIR.glob("*.zip"):
-            with zipfile.ZipFile(zf, "r") as z:
-                z.extractall(DATA_DIR)
-            zf.unlink()
+        with zipfile.ZipFile(zip_path, "r") as z:
+            z.extractall(DATA_DIR)
+        zip_path.unlink()
     
     done(state, "setup")
     print("  Done.")
@@ -128,23 +122,9 @@ def step_features(state):
     
     import pandas as pd
     import numpy as np
-    from pathlib import Path
     
-    # ROGII data is in train/ and test/ directories with per-well CSVs
-    def load_all_wells(split):
-        base = DATA_DIR / split
-        dfs = []
-        for well_dir in sorted(base.iterdir()):
-            if not well_dir.is_dir():
-                continue
-            for csv_file in well_dir.glob("*.csv"):
-                df = pd.read_csv(csv_file)
-                df["well_name"] = well_dir.name
-                dfs.append(df)
-        return pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
-    
-    train = load_all_wells("train")
-    test = load_all_wells("test")
+    train = pd.read_csv(DATA_DIR / "train.csv")
+    test = pd.read_csv(DATA_DIR / "test.csv")
     
     from features import build_features
     train_fe = build_features(train)
@@ -169,7 +149,7 @@ def step_prepare(state):
     train_fe = load_pkl("train_fe")
     test_fe = load_pkl("test_fe")
     
-    drop = ["id", TARGET, "well_name", "source_file"]
+    drop = ["id", TARGET]
     feats = [c for c in train_fe.columns if c not in drop]
     common = [f for f in feats if f in test_fe.columns]
     

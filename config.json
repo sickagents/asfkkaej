@@ -1,10 +1,10 @@
 {
     "vps_id": 1,
     "total_vps": 5,
-    "competition": "rogii-wellbore-geology-prediction",
-    "target": "TVT",
+    "competition": "playground-series-s6e5",
+    "target": "PitNextLap",
     "optuna_trials": 500,
-    "cv_folds": 5,
+    "cv_folds": 10,
     "max_session_minutes": 30,
     "seed_base": 42
 }

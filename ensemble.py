@@ -92,17 +92,7 @@ def main():
         return
     
     # Ground truth
-    # Load ground truth - ROGII data is in directories
-    from pathlib import Path
-    train_dfs = []
-    for well_dir in sorted((DATA / "train").iterdir()):
-        if not well_dir.is_dir():
-            continue
-        for csv_file in well_dir.glob("*.csv"):
-            df = pd.read_csv(csv_file)
-            train_dfs.append(df)
-    train = pd.concat(train_dfs, ignore_index=True)
-    y = train[TARGET].values
+    y = pd.read_csv(DATA / "train.csv")[TARGET].values
     
     oof_list = [r["oof_preds"] for r in vps_list]
     test_list = [r["test_preds"] for r in vps_list]
