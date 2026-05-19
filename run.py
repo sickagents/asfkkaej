@@ -249,7 +249,7 @@ def step_tune(state, session_start):
     n_trials = max(50, min(N_TRIALS, int(remaining_sec / 15)))
     
     print(f"  Running {n_trials} trials on {os.cpu_count()} cores...")
-    study.optimize(objective, n_trials=n_trials, n_jobs=-1, show_progress_bar=True)
+    study.optimize(objective, n_trials=n_trials, n_jobs=1, show_progress_bar=True)
     
     state["trials_done"] = prev_trials + len(study.trials)
     state["best_auc"] = max(best_auc, study.best_value)
