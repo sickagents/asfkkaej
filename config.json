@@ -5,6 +5,6 @@
     "target": "PitNextLap",
     "optuna_trials": 500,
     "cv_folds": 10,
-    "max_session_minutes": 50,
+    "max_session_minutes": 30,
     "seed_base": 42
 }
